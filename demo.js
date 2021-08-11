@@ -7,8 +7,8 @@ async function main(){
 
     try{
     await client.connect();
-       
-    await createMultipleListings (client,[
+     //create from CRUD  
+    /**await createMultipleListings (client,[
         {
             name:"Infinite Views",
             summary:"Modern home withb infinite pool",
@@ -22,7 +22,9 @@ async function main(){
             property_type:'apartment',
             bathroom:1
         }
-    ]);
+    ]); **/
+    //read from CRUD
+    await findOneListingByName(client,"Infinite Views");
    
     }catch(e){
         console.error(e);
@@ -33,6 +35,17 @@ async function main(){
     }
 }
 main().catch(console.error);
+async function findOneListingByName(client, nameOfListing){
+    const result = await client.db("sample_airbnb").collection("listingsAndReviews").findOne({name:nameOfListing});
+
+    if(result){
+        console.log(`Found a listing in the collection with the name '${nameOfListing}' `);
+        console.log(result);
+    }
+    else {
+        console.log(`No listings found with the name '${nameOfListing}`);
+    }
+}
 
 async function createMultipleListings(client, newListings){
     const result = await client.db("sample_airbnb").collection("listingsAndReviews")
