@@ -24,8 +24,12 @@ async function main(){
         }
     ]); **/
     //read from CRUD
-    await findOneListingByName(client,"Infinite Views");
-   
+   // await findOneListingByName(client,"Infinite Views");
+   await findListingsWithMinimumBedroomsBathroomsAndMostRecentReviews(client,{
+       minimumNumberOfBedrooms:1,
+       minimumNumberOfBathrooms:1,
+       maximumNumberOfResults:5
+    })
     }catch(e){
         console.error(e);
     }
@@ -35,6 +39,26 @@ async function main(){
     }
 }
 main().catch(console.error);
+async function findListingsWithMinimumBedroomsBathroomsAndMostRecentReviews(client,{
+    minimumNumberOfBedrooms=0,
+    minimumNumberOfBathrooms=0,
+    maximumNumberOfResults = Number.MAX_SAFE_INTEGER
+
+}={}){
+ const cursor= client.db("sample_airbnb").collection("listingsAndReviews").find({
+       bedrooms:{$gte:minimumNumberOfBedrooms},
+       bathrooms:{$gte:minimumNumberOfBathrooms}
+   }).sort({last_review:-1})
+   .limit(maximumNumberOfResults);
+
+   const results = await cursor.toArray();
+   if(results.length >0){
+       console.log(`Found listings with at least ${minimumNumberOfBedrooms}
+       bedrooms and ${minimumNumberOfBathrooms} bathrooms`);
+   }
+
+}
+
 async function findOneListingByName(client, nameOfListing){
     const result = await client.db("sample_airbnb").collection("listingsAndReviews").findOne({name:nameOfListing});
 
